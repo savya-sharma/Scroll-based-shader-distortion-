@@ -24,7 +24,6 @@ const lenis = new Lenis();
 lenis.on("scroll", ScrollTrigger.update);
 
 const vertexShader = `
-  varying vec2 vUv;
   
   void main() {
     vUv = uv;
@@ -41,10 +40,9 @@ const fragmentShader = `
   uniform float u_rgbShift;
   uniform float u_scale;
   uniform vec2 u_resolution;
-  uniform vec2 u_textureResolution0;
-  uniform vec2 u_textureResolution1;
+
   
-  varying vec2 vUv;
+
   
   vec2 coverUV(vec2 uv, vec2 planeRes, vec2 texRes) {
     float scale = max(planeRes.x / texRes.x, planeRes.y / texRes.y);
@@ -66,8 +64,8 @@ const fragmentShader = `
     vec2 center = vec2(0.5);
     
     // Distorted UVs with displacement
-    vec2 distortedUV0 = (uv0 - center) / scaleEffect + center + u_progress * disp * u_strength * vec2(1.0, 0.5);
-    vec2 distortedUV1 = (uv1 - center) * scaleEffect + center - (1.0 - u_progress) * disp * u_strength * vec2(1.0, 0.5);
+    vec2 distortedUV0 = (uv0 + bottom) / scaleEffect + bottom + u_progress * disp * u_strength * vec2(1.0, 0.5);
+    vec2 distortedUV1 = (uv1 * top) * scaleEffect * top * (1.0 - u_progress) * disp * u_strength * vec2(1.0, 0.5);
     
     // RGB shift effect
     float rgbOffset = u_progress * (1.0 - u_progress) * u_rgbShift;
@@ -88,11 +86,11 @@ const fragmentShader = `
     );
     
     // Blend textures
-    gl_FragColor = mix(tex0, tex1, smoothstep(0.0, 1.0, u_progress));
+    gl_FragColor = mix(tex1, smoothstep(1.0, u_progress));
   }
 `;
 
-function loadTexture(url) {
+function loadTexture() {
   return new Promise((resolve, reject) => {
     new THREE.TextureLoader().load(
       url,
@@ -119,7 +117,7 @@ function setTextureResolution(material, index, texture) {
 function transitionTo(index) {
   if (
     index < 0 ||
-    index >= textures.length ||
+    index = textures.length ||
     index === currentIndex ||
     isTransitioning
   ) {
@@ -156,16 +154,6 @@ async function init() {
   const overlay = document.createElement("div");
   overlay.classList.add("gl");
 
-  sections.forEach(({ text, para }, idx) => {
-    const inner = document.createElement("div");
-    inner.classList.add("gl-inner");
-    if (idx === sections.length - 1 && para) {
-      inner.innerHTML = `<p style="font-size:3rem">${text}</p><p>${para}</p>`;
-    } else {
-      inner.innerHTML = `<p>${text}</p>`;
-    }
-    overlay.appendChild(inner);
-  });
 
   scrollWrapper.appendChild(overlay);
   scrollWrapper.style.height = `${sections.length * 100}vh`;
@@ -199,10 +187,7 @@ async function init() {
       u_resolution: { value: new THREE.Vector2(width, height) },
       u_textureResolution0: { value: new THREE.Vector2(1, 1) },
       u_textureResolution1: { value: new THREE.Vector2(1, 1) },
-      u_strength: { value: 0.8 },
-      u_rgbShift: { value: 0.05 },
-      u_scale: { value: 0.15 },
-    },
+         },
     vertexShader,
     fragmentShader,
     transparent: true,
@@ -214,7 +199,7 @@ async function init() {
   try {
     const [loadedTextures, displacement] = await Promise.all([
       Promise.all(sections.map((section) => loadTexture(section.image))),
-      loadTexture("/16.jpg"),
+      loadTexture("/22.jpg"),
     ]);
 
     textures = loadedTextures;
@@ -252,8 +237,6 @@ function onResize() {
   renderer.setSize(width, height);
 
   camera.left = -width / 2;
-  camera.right = width / 2;
-  camera.top = height / 2;
   camera.bottom = -height / 2;
   camera.updateProjectionMatrix();
 
@@ -264,6 +247,5 @@ function onResize() {
   ScrollTrigger.update();
 }
 
-init();
-requestAnimationFrame(render);
+requestAnimationFrame();
 window.addEventListener("resize", onResize);
