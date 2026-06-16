@@ -6,9 +6,9 @@ import Lenis from "lenis";
 gsap.registerPlugin(ScrollTrigger);
 
 const sections = [
-  { text: "LEXA", image: "/images/img1.png" },
-  { text: "ROAR", image: "/images/img2.png" },
-  { text: "SPARK", image: "/images/img3.png" },
+  { text: "Sakazuki", image: "/images/img01.jpg" },
+  { text: "THE HEART OF SAKAZUKI", image: "/images/img02.jpg" },
+  { text: "Philosophy", para:"The people behind each work — across craft, art, and culture — are not simply makers, but express a way of thinking and living. SAKAZUKI exists not to present products, but to share the philosophy behind them. We act as a catalyst — connecting people and culture, and carrying those connections forward digitally.", image: "/images/img03.jpg" },
 ];
 
 const scrollWrapper = document.getElementById("gl-container");
@@ -93,13 +93,14 @@ const fragmentShader = `
 `;
 
 function loadTexture(url) {
-  return new Promise((resolve, reject) => 
-    {
-    new THREE.TextureLoader().load(url, (texture) => {
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      resolve(texture);
-    },
+  return new Promise((resolve, reject) => {
+    new THREE.TextureLoader().load(
+      url,
+      (texture) => {
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        resolve(texture);
+      },
       undefined,
       reject,
     );
@@ -155,10 +156,14 @@ async function init() {
   const overlay = document.createElement("div");
   overlay.classList.add("gl");
 
-  sections.forEach(({ text }) => {
+  sections.forEach(({ text, para }, idx) => {
     const inner = document.createElement("div");
     inner.classList.add("gl-inner");
-    inner.innerHTML = `<p>${text}</p>`;
+    if (idx === sections.length - 1 && para) {
+      inner.innerHTML = `<p style="font-size:3rem">${text}</p><p>${para}</p>`;
+    } else {
+      inner.innerHTML = `<p>${text}</p>`;
+    }
     overlay.appendChild(inner);
   });
 
@@ -209,7 +214,7 @@ async function init() {
   try {
     const [loadedTextures, displacement] = await Promise.all([
       Promise.all(sections.map((section) => loadTexture(section.image))),
-      loadTexture("/15.jpg"),
+      loadTexture("/16.jpg"),
     ]);
 
     textures = loadedTextures;

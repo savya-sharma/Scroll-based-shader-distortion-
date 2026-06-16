@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: "Bebas Neue", sans-serif;
 }
 
 html,
@@ -23,7 +23,7 @@ footer {
   h1,
   h2 {
     font-size: 7vmax;
-    color: #fff;
+    color: #ffffffd6;
     text-align: center;
     line-height: 1;
     font-weight: 500;
@@ -55,11 +55,20 @@ footer {
   height: 100vh;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+}
 
-  p {
-    font-size: 10vmax;
-    color: #fff;
-  }
+.gl-inner p {
+  font-size: 10vmax;
+  color: #ffffffd6;
+}
+
+.gl-inner p:nth-of-type(2) {
+  font-size: 1.9rem;
+  padding-top: 3rem;
+  width: 40rem;
+  text-align: center;
+  color: #ffffffa6;
 }
